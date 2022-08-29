@@ -44,3 +44,23 @@ h1 {
     transform: translate(-50%, -50%);
     /* This accounts for centering in the page b/c of not completely centering with top and left*/
 }
+
+/* Image Container */
+.image-container {
+    margin: 10px 30%;
+}
+
+.image-container img {
+    margin-top: 5px;
+    width: 100%;
+}
+
+/* Media Query - Larger SmartPhone */
+@media screen and (max-width: 600px) {
+    h1 {
+        font-size: 20px;
+    }
+    .image-container {
+        margin: 10px;
+    }
+}
