@@ -1,27 +1,49 @@
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
 
+let ready = false; // When page first load we want it to be false
+let imagesLoaded = 0; // Counts for each image loaded
+let totalImages = 0; // So we know we are done loading
 let photosArray = [];
 
 // Unsplash API
-const count = 10;
+const count = 30;
 const apiKey = 'jFgS8tteGD425f4oZfygQVaVnD6gt6GucN2yyz3xFek';
 const apiUrl = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${count}`;
 
-// Helper function for DRY principle when using setAttribute on DOM
-function setAttributes(element, attributes) {
-    // Key is the src, alt, title, etc...
-    // Attributes is an object that will contain both key & value
-    for (const key in attributes) {
-        // element in this case will be variables item & img
-        element.setAttribute(key, attributes[key])
+// From eventListener 'load' Checks if all images were loaded
+function imageLoaded() {
+    console.log('image loaded');
+    imagesLoaded++;
+    if (imagesLoaded === totalImages){
+        ready = true;
+        loader.hidden = true;
+        console.log('ready = ', ready);
     }
 }
 
+// Helper function for DRY principle when using setAttribute on DOM
+// Key is the src, alt, title, etc...
+// Attributes is an object that will contain both key & value
+function setAttributes(element, attributes) {
+    for (const key in attributes) {
+        element.setAttribute(key, attributes[key]);
+        // element in this case will be variables item & img
+    }
+}
+
+
+
+
 // Create elements for photos & add to the DOM
 function displayPhotos() {
+    imagesLoaded = 0;
+    totalImages = photosArray.length;
+    console.log('total images', totalImages);
+
     // Run function for each photo in array
     photosArray.forEach((photo) => {
+
         // Create a <a> element to Unsplash
         const item = document.createElement('a');
         setAttributes(item, {
@@ -38,9 +60,12 @@ function displayPhotos() {
             alt: photo.alt_description,
             title: photo.alt_description,
         });
-        img.setAttribute('src', photo.urls.regular);
-        img.setAttribute('alt', photo.alt_description);
-        img.setAttribute('title', photo.alt_description);
+        // img.setAttribute('src', photo.urls.regular);
+        // img.setAttribute('alt', photo.alt_description);
+        // img.setAttribute('title', photo.alt_description);
+
+        // Add an eventListener for every time an image is done loading
+        img.addEventListener('load', imageLoaded);
 
         // Put <img> inside <a>, then put <a> in container
         item.appendChild(img);
@@ -59,5 +84,17 @@ async function getPhotos() {
         //Catch error
     }
 }
+
+//Check to see if scrolling near bottom of page, Load more pages
+window.addEventListener('scroll', () => {
+    console.log('scrolled');
+    //window.innerHeight = height of browser window
+    // window.scrollY = how high we are from top of page
+    // document.body.offsetHeight
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
+        ready = false;
+        getPhotos();
+    }
+});
 
 getPhotos();
